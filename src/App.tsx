@@ -1,51 +1,89 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+"use client"
+
+import { BrowserRouter, useRoutes } from 'react-router-dom';
+import { routes } from '@/routes/index';
+import { useAuthStore } from '@/store/authStore';
+import { useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+
+function AppRoutes() {
+  return useRoutes(routes);
+}
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect(() => {
+    const { setIsAuthenticated, setIsLoading, setUser } = useAuthStore.getState();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+        async (_event, session) => {
+            setIsAuthenticated(!!session);
+            if (session) {
+                const { data } = await supabase.auth.getUser();
+                setUser(data.user);
+            } else {
+                setUser(null);
+            }
+        }
+    );
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+        setIsAuthenticated(!!session);
+        if (session) {
+            const { data } = await supabase.auth.getUser();
+            setUser(data.user);
+        } else {
+            setUser(null);
+        }
+        setIsLoading(false);
+    });
+
+    return () => {
+        authListener?.subscription.unsubscribe();
+    };
+}, []);
+  
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 
 export default App;
+
+
+
+/*
+
+const { isLoading, setIsAuthenticated, setIsLoading } = useAuthStore();
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsAuthenticated(!!session);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setIsLoading(false);  // <- loading done!
+    });
+
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, [setIsAuthenticated, setIsLoading]);
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+
+
+*/
