@@ -1,125 +1,142 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/store/authStore";
+import { toast } from "sonner";
+import { SignUpConfirmDialog } from "./signup-confirm-dialog";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [showSignUpDialog, setShowSignUpDialog] = useState(false);
 
-  const signIn = useAuthStore((state) => state.signIn);
-  const signUp = useAuthStore((state) => state.signUp);
+  const { isLoading, error, reset, signInOrSignUpFlow } = useAuthStore();
+
+  const promptForName = () => {
+    // Return a Promise that resolves to the name entered by the user or null if canceled.
+    return new Promise<string | null>((resolve) => {
+      setShowSignUpDialog(true);
+
+      const handleConfirm = (name: string) => {
+        setShowSignUpDialog(false);
+        resolve(name);
+      };
+
+      const handleCancel = () => {
+        setShowSignUpDialog(false);
+        resolve(null);
+      };
+
+      // Temporarily attach handlers to state so dialog can use them.
+      // We'll handle that in JSX below with props.
+      // But since this is inside the promise, we'll just pass these to the dialog component below.
+      // Alternatively, you can manage this with component state or context.
+      // For simplicity, we'll store these in component state.
+      setSignUpHandlers({ onConfirm: handleConfirm, onCancel: handleCancel });
+    });
+  };
+
+  // Store handlers for SignUpConfirmDialog
+  const [signUpHandlers, setSignUpHandlers] = useState<{
+    onConfirm: (name: string) => void;
+    onCancel: () => void;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    reset();
+
+    if (!email || !password) {
+      const message = "Email and password are required.";
+      useAuthStore.getState().setError(message);
+      toast.error(message);
+      return;
+    }
 
     try {
-      await signIn(email, password);
-      navigate("/"); // ✅ Redirect after successful login
-    } catch (err: any) {
-      if (
-        err.status === 400 ||
-        err.message?.toLowerCase().includes("invalid login credentials")
-      ) {
-        const confirmSignup = window.confirm(
-          "No account found with these credentials. Do you want to sign up?"
-        );
-        if (confirmSignup) {
-          try {
-            await signUp(email, password);
-            // ✅ Optionally sign in after signup (if needed)
-            await signIn(email, password);
-            navigate("/"); // ✅ Redirect after successful signup + login
-          } catch (signupErr: any) {
-            setError(signupErr.message || "Signup failed");
-          }
-        } else {
-          setError("Signup canceled by user.");
-        }
+      await signInOrSignUpFlow(email, password, promptForName);
+      const currentError = useAuthStore.getState().error;
+
+      if (currentError) {
+        toast.error(typeof currentError === "string" ? currentError : currentError.message);
       } else {
-        setError(err.message || "Login failed");
+        toast.success(`Logged in as ${email}`);
+        navigate("/");
       }
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Authentication failed. Please try again.";
+      console.error("Authentication failed:", message);
+      useAuthStore.getState().setError(message);
+      toast.error(message);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={cn("flex flex-col gap-6", className)}
-      {...props}
-    >
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
-        <p className="text-muted-foreground text-sm text-balance">
-          Enter your email below to login to your account
-        </p>
-      </div>
-
-      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-      <div className="grid gap-6">
-        <div className="grid gap-3">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="m@example.com"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+    <>
+      <form onSubmit={handleSubmit} className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-2xl font-bold">Login to your account</h1>
+          <p className="text-muted-foreground text-sm text-balance">
+            Enter your email below to login to your account
+          </p>
         </div>
-        <div className="grid gap-3">
-          <div className="flex items-center">
-            <Label htmlFor="password">Password</Label>
-            <a
-              href="#"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </a>
+
+        {error && (
+          <p className="text-red-500 text-sm text-center">
+            {typeof error === "string" ? error : error?.message || "An error occurred"}
+          </p>
+        )}
+
+        <div className="grid gap-6">
+          <div className="grid gap-3">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="m@example.com"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value.trim())}
+              disabled={isLoading}
+            />
           </div>
-          <Input
-            id="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+
+          <div className="grid gap-3">
+            <div className="flex items-center">
+              <Label htmlFor="password">Password</Label>
+              <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
+                Forgot your password?
+              </a>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+            />
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Processing..." : "Login"}
+          </Button>
         </div>
-        <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? "Processing..." : "Login"}
-        </Button>
+      </form>
 
-        <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-          <span className="bg-background text-muted-foreground relative z-10 px-2">
-            Or continue with
-          </span>
-        </div>
-
-        <Button variant="outline" className="w-full">
-          {/* Google SVG here */}
-          Login with Google
-        </Button>
-      </div>
-
-      <div className="text-center text-sm">
-        Don&apos;t have an account?{" "}
-        <a href="#" className="underline underline-offset-4">
-          Sign up
-        </a>
-      </div>
-    </form>
+      {/* Show signup dialog only when showSignUpDialog is true */}
+      {showSignUpDialog && signUpHandlers && (
+        <SignUpConfirmDialog
+          open={showSignUpDialog}
+          onConfirm={signUpHandlers.onConfirm}
+          onCancel={signUpHandlers.onCancel}
+          message={`No account found for ${email}. Please enter your name to create one.`}
+        />
+      )}
+    </>
   );
 }

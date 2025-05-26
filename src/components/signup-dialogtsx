@@ -1,0 +1,38 @@
+import React, { useState } from 'react';
+import { SignUpConfirmDialog } from './signup-confirm-dialog';
+
+export function useConfirmDialog() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [promiseInfo, setPromiseInfo] = React.useState<{
+    resolve: (value: boolean) => void;
+  } | null>(null);
+
+  const openConfirm = (message: string): Promise<boolean> => {
+    setIsOpen(true);
+    return new Promise((resolve) => {
+      setPromiseInfo({ resolve });
+    });
+  };
+
+  const handleConfirm = () => {
+    setIsOpen(false);
+    promiseInfo?.resolve(true);
+  };
+
+  const handleCancel = () => {
+    setIsOpen(false);
+    promiseInfo?.resolve(false);
+  };
+
+  return {
+    openConfirm,
+    ConfirmDialogComponent: (
+      <SignUpConfirmDialog
+        open={isOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        message="No account found for this email. Would you like to sign up instead?"
+      />
+    ),
+  };
+}
