@@ -50,10 +50,10 @@ export function NavUser() {
     async function fetchUser() {
       try {
         const currentUser = await fetchProfile();
-        toast(`Current user:  ${currentUser}`);
+        toast(`Current user:  ${currentUser.email}`);
         setUserData(currentUser);
       } catch (error) {
-        console.error('Error fetching user:', error);
+        toast( `${error}` || 'Failed to fetch user data');
       } finally {
         setLoading(false);
       }

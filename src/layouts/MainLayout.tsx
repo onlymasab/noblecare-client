@@ -9,13 +9,12 @@ export default function MainLayout() {
 
   const pathTitleMap: Record<string, string> = {
     '/': 'Dashboard',
-    '/product': 'Products',
-    "/production": "Production",
-    "/material": "Material",
-    "/invoice": "Invoice",
-    "/dispatch": "Dispatch",
-    "/return": "Return",
-    "/inventory": "Inventory",
+    '/appointment': 'Appointment',
+    "/paitient": "Paitient",
+    "/staff": "Staff",
+    "/message": "Messages",
+    "/review": "Reviews",
+    "/finance": "Finance",
     // add more mappings as needed
   };
 
