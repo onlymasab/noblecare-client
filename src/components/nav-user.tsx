@@ -47,26 +47,45 @@ export function NavUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true; // 💡 prevents setting state if unmounted
+
     async function fetchUser() {
       try {
         const currentUser = await fetchProfile();
-        toast(`Current user:  ${currentUser.email}`);
-        setUserData(currentUser);
-      } catch (error) {
-        toast( `${error}` || 'Failed to fetch user data');
+        if (isMounted) {
+          if (currentUser) {
+            toast.success(`Logged in as: ${currentUser.email}`);
+            setUserData(currentUser);
+          } else {
+            toast.warning('No user profile found');
+            setUserData(null);
+          }
+        }
+      } catch (error: any) {
+        console.error('Error fetching user:', error);
+        if (isMounted) {
+          toast.error(error.message || 'Failed to fetch user data');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
+
     fetchUser();
-  }, [fetchProfile]);
+
+    return () => {
+      isMounted = false; // 🧹 clean up on unmount
+    };
+  }, []); // ← run only once on mount
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      toast.success('Signed out successfully');
       console.log('Signed out');
     } catch (error) {
       console.error('Error signing out:', error);
+      toast.error('Error signing out');
     }
   };
 
