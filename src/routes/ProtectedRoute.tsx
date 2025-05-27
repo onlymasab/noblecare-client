@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { isAuthenticated } = useAuth();
 
   if (isAuthenticated === undefined) {
-    return <div className='text-red-100'>Loading...</div>; // or add a fancy spinner here!
+    return <div>Loading...</div>; // or add a fancy spinner here!
   }
 
   return isAuthenticated ? <>{children}</> : <Navigate to="/auth" replace />;

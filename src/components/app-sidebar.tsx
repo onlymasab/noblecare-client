@@ -182,7 +182,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <img src={logo} alt="logo" className="!size-8 p-1 rounded-sm" />
-                <span className="text-base font-semibold">Connect</span>
+                <span className="text-base font-semibold">Noblecare</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

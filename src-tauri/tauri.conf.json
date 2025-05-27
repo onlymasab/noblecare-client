@@ -12,9 +12,11 @@
   "app": {
     "windows": [
       {
-        "title": "noblecare",
-        "width": 1280,
-        "height": 720
+        "title": "Noblecare",
+        "width": 1200,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 600
       }
     ],
     "security": {

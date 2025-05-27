@@ -1,8 +1,8 @@
-import MainLayout from '@/layouts/MainLayout';
 import { RouteObject } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
-import DashboardPage from '@/pages/DashboardPage';
 import AuthPage from '@/pages/AuthPage';
+import ProtectedRoute from './ProtectedRoute';
+import MainLayout from '@/layouts/MainLayout';
+import DashboardPage from '@/pages/DashboardPage';
 
 export const routes: RouteObject[] = [
   {
@@ -17,7 +17,6 @@ export const routes: RouteObject[] = [
         index: true, // this is the default route for "/"
         element: <DashboardPage />,
       },
-      // Add more protected child routes here
     ],
   },
   {

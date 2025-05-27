@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import {
   IconCreditCard,
@@ -49,7 +50,7 @@ export function NavUser() {
     async function fetchUser() {
       try {
         const currentUser = await fetchProfile();
-        console.log('Current user:', currentUser);
+        toast(`Current user:  ${currentUser}`);
         setUserData(currentUser);
       } catch (error) {
         console.error('Error fetching user:', error);
