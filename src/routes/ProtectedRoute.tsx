@@ -1,18 +1,19 @@
-"use client"
+import { Navigate } from 'react-router-dom';
+import { ReactNode } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore } from '@/store/authStore';
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
 
-export default function ProtectedRoute({ children }: { children?: React.ReactNode }) {
-    const { isAuthenticated, isLoading } = useAuthStore();
-  
-    if (isLoading) {
-      return <div>Loading...</div>;
-    }
-  
-    if (!isAuthenticated) {
-      return <Navigate to="/auth" replace />;
-    }
-  
-    return children ? <>{children}</> : <Outlet />;
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated === undefined) {
+    return <div className='text-red-100'>Loading...</div>; // or add a fancy spinner here!
   }
+
+  return isAuthenticated ? <>{children}</> : <Navigate to="/auth" replace />;
+};
+
+export default ProtectedRoute;

@@ -14,7 +14,7 @@ export const routes: RouteObject[] = [
     ),
     children: [
       {
-        index: true,
+        index: true, // this is the default route for "/"
         element: <DashboardPage />,
       },
       // Add more protected child routes here

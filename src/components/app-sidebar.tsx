@@ -1,4 +1,5 @@
-import * as React from "react"
+"use client"
+import logo from "@/assets/images/logo-color.png"
 import {
   IconCamera,
   IconChartBar,
@@ -9,7 +10,6 @@ import {
   IconFileWord,
   IconFolder,
   IconHelp,
-  IconInnerShadowTop,
   IconListDetails,
   IconReport,
   IconSearch,
@@ -17,7 +17,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/nav-documents"
+
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -40,27 +40,42 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/",
       icon: IconDashboard,
     },
     {
-      title: "Lifecycle",
-      url: "#",
+      title: "Product",
+      url: "/product",
       icon: IconListDetails,
     },
     {
-      title: "Analytics",
-      url: "#",
+      title: "Production",
+      url: "/production",
       icon: IconChartBar,
     },
     {
-      title: "Projects",
-      url: "#",
+      title: "Material",
+      url: "/material",
       icon: IconFolder,
     },
     {
-      title: "Team",
-      url: "#",
+      title: "Invoice",
+      url: "/invoice",
+      icon: IconUsers,
+    },
+    {
+      title: "Disptach",
+      url: "/dispatch",
+      icon: IconUsers,
+    },
+    {
+      title: "Return",
+      url: "/return",
+      icon: IconUsers,
+    },
+    {
+      title: "Inventory",
+      url: "/inventory",
       icon: IconUsers,
     },
   ],
@@ -149,6 +164,13 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+
+ 
+
+
+  
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -159,8 +181,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <img src={logo} alt="logo" className="!size-8 p-1 rounded-sm" />
+                <span className="text-base font-semibold">Connect</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -168,11 +190,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser  />
       </SidebarFooter>
     </Sidebar>
   )
