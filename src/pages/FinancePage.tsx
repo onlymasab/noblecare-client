@@ -1,6 +1,19 @@
-// FinancePage.tsx
+"use client"; // Important for shadcn/ui components that rely on client-side interactivity
 
 import React, { useState } from 'react';
+
+// Import shadcn/ui components (adjust paths based on your shadcn setup)
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 // Define a type for your transaction object for better type safety
 interface Transaction {
@@ -43,7 +56,9 @@ export default function FinancePage() {
         const parsedAmount = parseFloat(newAmount);
 
         if (isNaN(parsedAmount) || newDescription.trim() === '') {
-            alert('Please enter a valid amount and description.');
+            // In a real app, use a shadcn/ui Toast or Dialog for notification
+            // For example: toast({ title: "Error", description: "Please enter a valid amount and description." });
+            console.error('Please enter a valid amount and description.');
             return;
         }
 
@@ -59,6 +74,10 @@ export default function FinancePage() {
         setNewDescription('');
         setNewAmount('');
         setNewType('expense'); // Reset to default
+
+        // In a real app, use a shadcn/ui Toast or Dialog for notification
+        // For example: toast({ title: "Success", description: "Transaction added successfully!" });
+        console.log('Transaction added:', newTransaction);
     };
 
     return (
@@ -74,132 +93,152 @@ export default function FinancePage() {
 
                 {/* Overview Cards */}
                 <section className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 flex flex-col justify-between transform transition duration-300 hover:scale-[1.02] hover:shadow-xl">
-                        <h2 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Total Balance</h2>
-                        <p className="text-4xl font-bold text-green-600 dark:text-green-400 mt-2">
-                            ${totalBalance.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Across all accounts</p>
-                    </div>
+                    <Card className="flex flex-col justify-between transform transition duration-300 hover:scale-[1.02] hover:shadow-xl">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="text-lg font-semibold text-gray-500 dark:text-gray-400">Total Balance</CardDescription>
+                            <CardTitle className="text-4xl font-bold text-green-600 dark:text-green-400">
+                                ${totalBalance.toFixed(2)}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-gray-400 dark:text-gray-500">Across all accounts</p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 flex flex-col justify-between transform transition duration-300 hover:scale-[1.02] hover:shadow-xl">
-                        <h2 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Monthly Income</h2>
-                        <p className="text-4xl font-bold text-blue-600 dark:text-blue-400 mt-2">
-                            ${monthlyIncome.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">This month</p>
-                    </div>
+                    <Card className="flex flex-col justify-between transform transition duration-300 hover:scale-[1.02] hover:shadow-xl">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="text-lg font-semibold text-gray-500 dark:text-gray-400">Monthly Income</CardDescription>
+                            <CardTitle className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                                ${monthlyIncome.toFixed(2)}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-gray-400 dark:text-gray-500">This month</p>
+                        </CardContent>
+                    </Card>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 flex flex-col justify-between transform transition duration-300 hover:scale-[1.02] hover:shadow-xl">
-                        <h2 className="text-lg font-semibold text-gray-500 dark:text-gray-400">Monthly Expenses</h2>
-                        <p className="text-4xl font-bold text-red-600 dark:text-red-400 mt-2">
-                            ${monthlyExpenses.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">This month</p>
-                    </div>
+                    <Card className="flex flex-col justify-between transform transition duration-300 hover:scale-[1.02] hover:shadow-xl">
+                        <CardHeader className="pb-2">
+                            <CardDescription className="text-lg font-semibold text-gray-500 dark:text-gray-400">Monthly Expenses</CardDescription>
+                            <CardTitle className="text-4xl font-bold text-red-600 dark:text-red-400">
+                                ${monthlyExpenses.toFixed(2)}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-gray-400 dark:text-gray-500">This month</p>
+                        </CardContent>
+                    </Card>
                 </section>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Recent Transactions */}
-                    <section className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Transactions</h2>
-                        <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar"> {/* Added custom-scrollbar */}
-                            {transactions.length > 0 ? (
-                                <ul className="space-y-3">
-                                    {transactions.map(transaction => (
-                                        <li
-                                            key={transaction.id}
-                                            className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150"
-                                        >
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-gray-900 dark:text-gray-100">
-                                                    {transaction.description}
-                                                </span>
-                                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {new Date(transaction.date).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                            <span
-                                                className={`font-semibold text-lg ${
-                                                    transaction.type === 'income' ? 'text-green-500' : 'text-red-500'
-                                                }`}
+                    <section className="lg:col-span-2">
+                        <Card className="h-full">
+                            <CardHeader>
+                                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">Recent Transactions</CardTitle>
+                            </CardHeader>
+                            <CardContent className="max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                                {transactions.length > 0 ? (
+                                    <ul className="space-y-3">
+                                        {transactions.map(transaction => (
+                                            <Card
+                                                key={transaction.id}
+                                                className="flex items-center justify-between p-3 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150"
                                             >
-                                                {transaction.type === 'income' ? '+' : '-'}$
-                                                {Math.abs(transaction.amount).toFixed(2)}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-gray-500 dark:text-gray-400 text-center py-8">No transactions yet. Add one above!</p>
-                            )}
-                        </div>
+                                                <div className="flex flex-col">
+                                                    <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-100">
+                                                        {transaction.description}
+                                                    </CardTitle>
+                                                    <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                                                        {new Date(transaction.date).toLocaleDateString()}
+                                                    </CardDescription>
+                                                </div>
+                                                <span
+                                                    className={`font-semibold text-lg ${
+                                                        transaction.type === 'income' ? 'text-green-500' : 'text-red-500'
+                                                    }`}
+                                                >
+                                                    {transaction.type === 'income' ? '+' : '-'}$
+                                                    {Math.abs(transaction.amount).toFixed(2)}
+                                                </span>
+                                            </Card>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">No transactions yet. Add one above!</p>
+                                )}
+                            </CardContent>
+                        </Card>
                     </section>
 
                     {/* Quick Add Transaction Form */}
-                    <section className="lg:col-span-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Quick Add Transaction</h2>
-                        <form onSubmit={handleAddTransaction} className="flex flex-col gap-4">
-                            <div>
-                                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Description
-                                </label>
-                                <input
-                                    type="text"
-                                    id="description"
-                                    value={newDescription}
-                                    onChange={(e) => setNewDescription(e.target.value)}
-                                    placeholder="e.g., Coffee, Salary"
-                                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Amount
-                                </label>
-                                <input
-                                    type="number"
-                                    id="amount"
-                                    value={newAmount}
-                                    onChange={(e) => setNewAmount(e.target.value)}
-                                    placeholder="e.g., 50.00"
-                                    step="0.01"
-                                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Type
-                                </label>
-                                <select
-                                    id="type"
-                                    value={newType}
-                                    onChange={(e) => setNewType(e.target.value as 'income' | 'expense')}
-                                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                >
-                                    <option value="expense">Expense</option>
-                                    <option value="income">Income</option>
-                                </select>
-                            </div>
-                            <button
-                                type="submit"
-                                className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition duration-150"
-                            >
-                                Add Transaction
-                            </button>
-                        </form>
+                    <section className="lg:col-span-1">
+                        <Card className="h-full flex flex-col">
+                            <CardHeader>
+                                <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">Quick Add Transaction</CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-grow">
+                                <form onSubmit={handleAddTransaction} className="flex flex-col gap-4">
+                                    <div>
+                                        <Label htmlFor="description" className="mb-1">
+                                            Description
+                                        </Label>
+                                        <Input
+                                            type="text"
+                                            id="description"
+                                            value={newDescription}
+                                            onChange={(e) => setNewDescription(e.target.value)}
+                                            placeholder="e.g., Coffee, Salary"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="amount" className="mb-1">
+                                            Amount
+                                        </Label>
+                                        <Input
+                                            type="number"
+                                            id="amount"
+                                            value={newAmount}
+                                            onChange={(e) => setNewAmount(e.target.value)}
+                                            placeholder="e.g., 50.00"
+                                            step="0.01"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="type" className="mb-1">
+                                            Type
+                                        </Label>
+                                        <Select value={newType} onValueChange={(value) => setNewType(value as 'income' | 'expense')}>
+                                            <SelectTrigger id="type" className="w-full">
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="expense">Expense</SelectItem>
+                                                <SelectItem value="income">Income</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <Button type="submit" className="w-full">
+                                        Add Transaction
+                                    </Button>
+                                </form>
+                            </CardContent>
+                        </Card>
                     </section>
                 </div>
 
                 {/* You could add a Chart section here */}
-                {/* <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Spending Trends</h2>
-                    {/* Placeholder for your chart component (e.g., from Chart.js, Recharts) }
-                    <div className="w-full h-80 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-500 dark:text-gray-400">
-                        [Chart goes here]
-                    </div>
+                {/* <section>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-2xl font-semibold text-gray-800 dark:text-gray-200">Spending Trends</CardTitle>
+                        </CardHeader>
+                        <CardContent className="w-full h-80 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-500 dark:text-gray-400">
+                            [Chart goes here]
+                        </CardContent>
+                    </Card>
                 </section> */}
             </div>
         </div>
