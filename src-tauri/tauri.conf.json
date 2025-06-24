@@ -8,7 +8,9 @@
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
+    
   },
+  
   "app": {
     "windows": [
       {
@@ -20,7 +22,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src tauri: http: https: data: 'unsafe-inline' 'unsafe-eval';"
     }
   },
   "bundle": {

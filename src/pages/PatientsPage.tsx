@@ -1,281 +1,584 @@
-export default function PatientsPage() {
-  // Mock patient data
-  const patients = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      age: 32,
-      gender: "Female",
-      lastVisit: "2023-05-15",
-      status: "Active",
-      condition: "Hypertension"
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      age: 45,
-      gender: "Male",
-      lastVisit: "2023-06-02",
-      status: "Active",
-      condition: "Diabetes"
-    },
-    {
-      id: 3,
-      name: "Emma Williams",
-      age: 28,
-      gender: "Female",
-      lastVisit: "2023-04-20",
-      status: "Inactive",
-      condition: "Asthma"
-    },
-    {
-      id: 4,
-      name: "David Kim",
-      age: 60,
-      gender: "Male",
-      lastVisit: "2023-06-10",
-      status: "Active",
-      condition: "Arthritis"
-    },
-    {
-      id: 5,
-      name: "Olivia Martinez",
-      age: 38,
-      gender: "Female",
-      lastVisit: "2023-03-15",
-      status: "Inactive",
-      condition: "Migraine"
-    }
-  ];
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiSearch, FiPlus, FiUser, FiCalendar, FiActivity, FiArrowRight, FiEdit2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { PulseLoader } from 'react-spinners';
+
+// AI Assistant Component
+const AIAssistant = ({ isActive, onToggle, onQuery }: { isActive: boolean, onToggle: () => void, onQuery: (query: string) => void }) => {
+  const [query, setQuery] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [response, setResponse] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    onQuery(query);
+    
+    // Simulate AI processing
+    setTimeout(() => {
+      setResponse(`I've analyzed the patient data. ${query.includes('trend') ? 
+        'The most common condition is Hypertension, followed by Diabetes. Active patients have increased by 12% this month.' : 
+        'Here are the relevant patient records matching your query.'}`);
+      setIsProcessing(false);
+    }, 2000);
+  };
 
   return (
-    <div className="flex flex-1 flex-col bg-gray-50">
-      <div className="@container/main flex flex-1 flex-col gap-2 p-4 md:p-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">Patient Management</h1>
-            
-            <div className="flex items-center gap-3">
-              <div className="relative w-full max-w-md">
-                <input
-                  type="text"
-                  placeholder="Search patients..."
-                  className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                />
-                <svg
-                  className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
-              
-              <button className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span className="hidden md:inline">Add Patient</span>
-              </button>
-            </div>
+    <AnimatePresence>
+      {isActive && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="absolute right-4 bottom-4 w-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-10"
+        >
+          <div className="bg-blue-600 p-3 text-white flex justify-between items-center">
+            <h3 className="font-medium">AI Assistant</h3>
+            <button onClick={onToggle} className="text-white hover:text-blue-200">
+              &times;
+            </button>
           </div>
           
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-lg bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-500">Total Patients</h3>
-                <div className="rounded-full bg-blue-100 p-2">
-                  <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+          <div className="p-4 h-60 overflow-y-auto">
+            {response ? (
+              <div className="text-sm text-gray-700">
+                <div className="flex items-start mb-3">
+                  <div className="bg-blue-100 text-blue-800 rounded-full p-1 mr-2">
+                    <FiUser className="h-4 w-4" />
+                  </div>
+                  <p>{query}</p>
+                </div>
+                <div className="flex items-start">
+                  <div className="bg-green-100 text-green-800 rounded-full p-1 mr-2">
+                    <FiActivity className="h-4 w-4" />
+                  </div>
+                  <p>{response}</p>
                 </div>
               </div>
-              <p className="mt-2 text-2xl font-semibold text-gray-900">124</p>
-              <p className="mt-1 text-sm text-gray-500">+12% from last month</p>
-            </div>
-            
-            <div className="rounded-lg bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-500">Active Patients</h3>
-                <div className="rounded-full bg-green-100 p-2">
-                  <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-gray-500">
+                <div className="bg-blue-100 text-blue-800 rounded-full p-3 mb-3">
+                  <FiActivity className="h-6 w-6" />
                 </div>
+                <p className="text-center text-sm">
+                  {isProcessing ? 'Analyzing patient data...' : 'Ask me anything about your patients'}
+                </p>
+                {isProcessing && (
+                  <div className="mt-2">
+                    <PulseLoader size={8} color="#3b82f6" />
+                  </div>
+                )}
               </div>
-              <p className="mt-2 text-2xl font-semibold text-gray-900">89</p>
-              <p className="mt-1 text-sm text-gray-500">+8% from last month</p>
-            </div>
-            
-            <div className="rounded-lg bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-500">New This Month</h3>
-                <div className="rounded-full bg-purple-100 p-2">
-                  <svg className="h-5 w-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                </div>
-              </div>
-              <p className="mt-2 text-2xl font-semibold text-gray-900">15</p>
-              <p className="mt-1 text-sm text-gray-500">+3 from last month</p>
-            </div>
-            
-            <div className="rounded-lg bg-white p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-500">Upcoming Appointments</h3>
-                <div className="rounded-full bg-yellow-100 p-2">
-                  <svg className="h-5 w-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
-              <p className="mt-2 text-2xl font-semibold text-gray-900">7</p>
-              <p className="mt-1 text-sm text-gray-500">Today: 2 appointments</p>
-            </div>
+            )}
           </div>
+          
+          <form onSubmit={handleSubmit} className="border-t p-3">
+            <div className="flex">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ask about patients..."
+                className="flex-1 border rounded-l-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={isProcessing}
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 text-white px-3 py-2 rounded-r-lg hover:bg-blue-700 disabled:bg-blue-300"
+                disabled={isProcessing || !query}
+              >
+                <FiArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+// Patient Card Component
+const PatientCard = ({ patient, onView, onEdit }: { 
+  patient: any, 
+  onView: () => void, 
+  onEdit: () => void 
+}) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+    >
+      <div className="p-4">
+        <div className="flex items-center space-x-3">
+          <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center 
+            ${patient.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600'}`}
+          >
+            {patient.name.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-medium text-gray-900 truncate">{patient.name}</h3>
+            <p className="text-xs text-gray-500">{patient.age} years • {patient.gender}</p>
+          </div>
+          <span className={`px-2 py-1 text-xs rounded-full 
+            ${patient.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+          >
+            {patient.status}
+          </span>
         </div>
         
-        {/* Patients Table */}
-        <div className="flex-1 rounded-lg bg-white p-4 shadow-sm">
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+            {patient.condition}
+          </span>
+          <div className="text-xs text-gray-500">
+            Last visit: {patient.lastVisit}
+          </div>
+        </div>
+      </div>
+      
+      <div className="border-t px-4 py-2 bg-gray-50 flex justify-end space-x-2">
+        <button 
+          onClick={onView}
+          className="text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50"
+        >
+          <FiEye className="inline mr-1" /> View
+        </button>
+        <button 
+          onClick={onEdit}
+          className="text-xs text-gray-600 hover:text-gray-800 px-2 py-1 rounded hover:bg-gray-100"
+        >
+          <FiEdit2 className="inline mr-1" /> Edit
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
+export default function PatientsPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isAIActive, setIsAIActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [patients, setPatients] = useState<any[]>([]);
+  
+  // Mock patient data
+  useEffect(() => {
+    setIsLoading(true);
+    // Simulate API fetch
+    setTimeout(() => {
+      setPatients([
+        {
+          id: 1,
+          name: "Sarah Johnson",
+          age: 32,
+          gender: "Female",
+          lastVisit: "May 15, 2023",
+          status: "Active",
+          condition: "Hypertension"
+        },
+        {
+          id: 2,
+          name: "Michael Chen",
+          age: 45,
+          gender: "Male",
+          lastVisit: "Jun 2, 2023",
+          status: "Active",
+          condition: "Diabetes"
+        },
+        {
+          id: 3,
+          name: "Emma Williams",
+          age: 28,
+          gender: "Female",
+          lastVisit: "Apr 20, 2023",
+          status: "Inactive",
+          condition: "Asthma"
+        },
+        {
+          id: 4,
+          name: "David Kim",
+          age: 60,
+          gender: "Male",
+          lastVisit: "Jun 10, 2023",
+          status: "Active",
+          condition: "Arthritis"
+        },
+        {
+          id: 5,
+          name: "Olivia Martinez",
+          age: 38,
+          gender: "Female",
+          lastVisit: "Mar 15, 2023",
+          status: "Inactive",
+          condition: "Migraine"
+        },
+        {
+          id: 6,
+          name: "James Wilson",
+          age: 52,
+          gender: "Male",
+          lastVisit: "Jun 5, 2023",
+          status: "Active",
+          condition: "Hypertension"
+        },
+        {
+          id: 7,
+          name: "Sophia Brown",
+          age: 41,
+          gender: "Female",
+          lastVisit: "May 22, 2023",
+          status: "Active",
+          condition: "Diabetes"
+        },
+        {
+          id: 8,
+          name: "Robert Taylor",
+          age: 35,
+          gender: "Male",
+          lastVisit: "Apr 30, 2023",
+          status: "Inactive",
+          condition: "Back Pain"
+        }
+      ]);
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+  
+  const filteredPatients = patients.filter(patient =>
+    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  const patientsPerPage = viewMode === 'grid' ? 8 : 5;
+  const totalPages = Math.ceil(filteredPatients.length / patientsPerPage);
+  const paginatedPatients = filteredPatients.slice(
+    (currentPage - 1) * patientsPerPage,
+    currentPage * patientsPerPage
+  );
+  
+  const stats = {
+    totalPatients: patients.length,
+    activePatients: patients.filter(p => p.status === 'Active').length,
+    newThisMonth: 15,
+    upcomingAppointments: 7
+  };
+  
+  const handleAIAssistantQuery = (query: string) => {
+    // In a real app, this would call an AI service
+    console.log('AI Query:', query);
+  };
+  
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      {/* Header */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6"
+      >
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Patient Management</h1>
+          <p className="text-gray-600">Manage and monitor your patients</p>
+        </div>
+        
+        <div className="mt-4 md:mt-0 flex items-center space-x-3">
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search patients..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full md:w-64"
+            />
+          </div>
+          
+          <button 
+            onClick={() => setIsAIActive(!isAIActive)}
+            className={`p-2 rounded-lg ${isAIActive ? 'bg-blue-600 text-white' : 'bg-white text-blue-600 border border-blue-200'}`}
+          >
+            <FiActivity className="h-5 w-5" />
+          </button>
+          
+          <button 
+            onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
+            className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+          >
+            {viewMode === 'grid' ? (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            )}
+          </button>
+          
+          <button className="flex items-center space-x-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition">
+            <FiPlus className="h-4 w-4" />
+            <span className="hidden md:inline">Add Patient</span>
+          </button>
+        </div>
+      </motion.div>
+      
+      {/* Stats Cards */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+      >
+        {[
+          { 
+            title: 'Total Patients', 
+            value: stats.totalPatients, 
+            change: '+12% from last month',
+            icon: <FiUser className="h-5 w-5" />,
+            color: 'bg-blue-100 text-blue-600'
+          },
+          { 
+            title: 'Active Patients', 
+            value: stats.activePatients, 
+            change: '+8% from last month',
+            icon: <FiActivity className="h-5 w-5" />,
+            color: 'bg-green-100 text-green-600'
+          },
+          { 
+            title: 'New This Month', 
+            value: stats.newThisMonth, 
+            change: '+3 from last month',
+            icon: <FiPlus className="h-5 w-5" />,
+            color: 'bg-purple-100 text-purple-600'
+          },
+          { 
+            title: 'Upcoming Appointments', 
+            value: stats.upcomingAppointments, 
+            change: 'Today: 2 appointments',
+            icon: <FiCalendar className="h-5 w-5" />,
+            color: 'bg-yellow-100 text-yellow-600'
+          }
+        ].map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * index }}
+            className="bg-white rounded-lg shadow-sm p-4 border border-gray-200"
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm font-medium text-gray-500">{stat.title}</p>
+                <p className="text-2xl font-semibold mt-1">{stat.value}</p>
+                <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
+              </div>
+              <div className={`p-2 rounded-full ${stat.color}`}>
+                {stat.icon}
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+      
+      {/* Patients List */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+      >
+        {isLoading ? (
+          <div className="flex justify-center items-center p-12">
+            <PulseLoader size={12} color="#3b82f6" />
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="p-4">
+            {filteredPatients.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No patients found matching your search</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {paginatedPatients.map(patient => (
+                  <PatientCard 
+                    key={patient.id}
+                    patient={patient}
+                    onView={() => console.log('View', patient.id)}
+                    onEdit={() => console.log('Edit', patient.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Patient Name
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Age/Gender
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Condition
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Last Visit
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th scope="col" className="relative px-6 py-3">
-                    <span className="sr-only">Actions</span>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {patients.map((patient) => (
-                  <tr key={patient.id} className="hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0">
-                          <div className="flex h-full items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                            {patient.name.charAt(0)}
-                          </div>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{patient.name}</div>
-                          <div className="text-sm text-gray-500">ID: {patient.id}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="text-sm text-gray-900">{patient.age} years</div>
-                      <div className="text-sm text-gray-500">{patient.gender}</div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <span className="inline-flex rounded-full bg-blue-100 px-2 text-xs font-semibold leading-5 text-blue-800">
-                        {patient.condition}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                      {patient.lastVisit}
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${patient.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {patient.status}
-                      </span>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900">View</button>
-                      <button className="ml-4 text-gray-600 hover:text-gray-900">Edit</button>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredPatients.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                      No patients found matching your search
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedPatients.map(patient => (
+                    <motion.tr 
+                      key={patient.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="hover:bg-gray-50"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center 
+                            ${patient.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600'}`}
+                          >
+                            {patient.name.charAt(0)}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{patient.name}</div>
+                            <div className="text-sm text-gray-500">ID: {patient.id}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{patient.age} years</div>
+                        <div className="text-sm text-gray-500">{patient.gender}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                          {patient.condition}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {patient.lastVisit}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${patient.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+                        >
+                          {patient.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button 
+                          onClick={() => console.log('View', patient.id)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                        >
+                          <FiEye className="inline mr-1" /> View
+                        </button>
+                        <button 
+                          onClick={() => console.log('Edit', patient.id)}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
+                          <FiEdit2 className="inline mr-1" /> Edit
+                        </button>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
-          
-          {/* Pagination */}
-          <div className="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+        )}
+        
+        {/* Pagination */}
+        {filteredPatients.length > 0 && (
+          <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to <span className="font-medium">5</span> of{' '}
-                  <span className="font-medium">24</span> results
+                  Showing <span className="font-medium">{(currentPage - 1) * patientsPerPage + 1}</span> to{' '}
+                  <span className="font-medium">{Math.min(currentPage * patientsPerPage, filteredPatients.length)}</span> of{' '}
+                  <span className="font-medium">{filteredPatients.length}</span> results
                 </p>
               </div>
               <div>
-                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                  <a
-                    href="#"
-                    className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10"
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     <span className="sr-only">Previous</span>
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                    </svg>
-                  </a>
-                  <a
-                    href="#"
-                    aria-current="page"
-                    className="relative z-10 inline-flex items-center border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 focus:z-10"
-                  >
-                    1
-                  </a>
-                  <a
-                    href="#"
-                    className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10"
-                  >
-                    2
-                  </a>
-                  <a
-                    href="#"
-                    className="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 md:inline-flex"
-                  >
-                    3
-                  </a>
-                  <span className="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700">
-                    ...
-                  </span>
-                  <a
-                    href="#"
-                    className="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 md:inline-flex"
-                  >
-                    8
-                  </a>
-                  <a
-                    href="#"
-                    className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10"
+                    <FiChevronLeft className="h-5 w-5" />
+                  </button>
+                  
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium 
+                          ${currentPage === pageNum ? 
+                            'z-10 bg-blue-50 border-blue-500 text-blue-600' : 
+                            'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
                     <span className="sr-only">Next</span>
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l4.5 4.25a.75.75 0 11-1.04 1.08L11.168 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                    </svg>
-                  </a>
+                    <FiChevronRight className="h-5 w-5" />
+                  </button>
                 </nav>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        )}
+      </motion.div>
+      
+      {/* AI Assistant */}
+      <AIAssistant 
+        isActive={isAIActive} 
+        onToggle={() => setIsAIActive(false)}
+        onQuery={handleAIAssistantQuery}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 
 import AuthCover from "@/assets/images/auth-cover.png"
 import LogoColor from "@/assets/images/logo-color.png"
-import { LoginForm } from "@/components/login-form"
+import {LoginForm }from "@/components/login-form"
 
 
 export default function AuthPage() {

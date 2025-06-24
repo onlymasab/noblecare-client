@@ -5,6 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 export const AppointmentCalendar = () => {
   const events = [
@@ -36,8 +37,8 @@ export const AppointmentCalendar = () => {
           }}
           events={events}
           selectable={true}
-          dateClick={(info) => alert(`Clicked on ${info.dateStr}`)}
-          eventClick={(info) => alert(`Event: ${info.event.title}`)}
+          dateClick={(info) => toast(`Clicked on ${info.dateStr}`)}
+          eventClick={(info) => toast(`Event: ${info.event.title}`)}
           height="auto"
         />
       </CardContent>
