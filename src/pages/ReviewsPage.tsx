@@ -106,10 +106,10 @@ export default function ReviewsPage() {
     const [helpfulClicked, setHelpfulClicked] = useState<Set<string>>(new Set());
 
     // Get unique departments for filter
-    const departments = useMemo(() => {
-        const depts = new Set(reviews.map(review => review.department));
-        return Array.from(depts).sort();
-    }, [reviews]);
+   const departments = useMemo(() => {
+  const depts = new Set(reviews.map(review => review.department).filter(Boolean)); // Filter out null/undefined
+  return Array.from(depts).sort();
+}, [reviews]);
 
     // Filter and sort reviews
     const filteredReviews = useMemo(() => {
@@ -331,20 +331,26 @@ export default function ReviewsPage() {
                                 </Button>
                             ))}
                             
-                            <Select value={departmentFilter || ""} onValueChange={val => setDepartmentFilter(val || null)}>
-                                <SelectTrigger className="w-[180px] rounded-full">
-                                    <div className="flex items-center gap-2">
-                                        <span>{departmentFilter ? departmentFilter : "All Departments"}</span>
-                                        <ChevronDown className="h-4 w-4 opacity-50" />
-                                    </div>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="">All Departments</SelectItem>
-                                    {departments.map(dept => (
-                                        <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            {/* <Select
+  value={departmentFilter || ""}
+  onValueChange={(val) => setDepartmentFilter(val || null)}
+>
+  <SelectTrigger className="w-[180px] rounded-full">
+    <div className="flex items-center gap-2">
+      <span>{departmentFilter || "All Departments"}</span>
+      <ChevronDown className="h-4 w-4 opacity-50" />
+    </div>
+  </SelectTrigger>
+
+  <SelectContent>
+    <SelectItem value="">All Departments</SelectItem>
+    {departments.map((dept) => (
+      <SelectItem key={dept} value={dept}>
+        {dept}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select> */}
                             
                             {(ratingFilter !== null || departmentFilter) && (
                                 <Button 
