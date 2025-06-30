@@ -1,50 +1,159 @@
+"use client"
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Star, MessageSquareText, ThumbsUp, TrendingUp, Users, Sparkles } from "lucide-react"; // Added Sparkles for AI icon
+import { Star, MessageSquareText, ThumbsUp, TrendingUp, Sparkles, ChevronRight, Filter, ChevronDown } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Define an interface for a Patient Review
 interface PatientReview {
     id: string;
     quote: string;
     author: string;
-    rating: number; // e.g., 5 for 5 stars
-    date: string; // YYYY-MM-DD
+    rating: number;
+    date: string;
+    department: string;
+    helpfulCount: number;
+    verified?: boolean;
 }
 
 export default function ReviewsPage() {
-    // Dummy data for patient reviews with more varied dates for trend analysis
     const [reviews, setReviews] = useState<PatientReview[]>([
-        { id: 'pr1', quote: "The cardiology team here is exceptional. Dr. Smith was incredibly thorough and compassionate. I felt completely at ease.", author: "Eleanor R.", rating: 5, date: '2024-06-18' },
-        { id: 'pr2', quote: "From the moment I walked in, I knew I was in good hands. The staff is so caring, and the advanced technology gave me peace of mind.", author: "James P.", rating: 5, date: '2024-06-15' },
-        { id: 'pr3', quote: "My experience was seamless. Scheduling was easy, and the care I received for my heart condition was top-notch. Highly recommend!", author: "Maria K.", rating: 4, date: '2024-06-12' },
-        { id: 'pr4', quote: "I'm so grateful for the expertise of this department. They accurately diagnosed and treated my condition with great professionalism.", author: "Robert D.", rating: 5, date: '2024-06-10' },
-        { id: 'pr5', quote: "The doctors were great, but the wait times were a bit long.", author: "Sophia L.", rating: 3, date: '2024-06-01' },
-        { id: 'pr6', quote: "Excellent follow-up care and clear explanations. Very happy with the service.", author: "William B.", rating: 5, date: '2024-05-28' },
-        { id: 'pr7', quote: "Could improve on communication regarding appointment changes.", author: "Olivia M.", rating: 2, date: '2024-05-25' },
-        { id: 'pr8', quote: "Life-saving treatment, profound gratitude to the entire team.", author: "Noah J.", rating: 5, date: '2024-05-20' },
-        { id: 'pr9', quote: "A little disappointed with the initial consultation, but subsequent visits were much better.", author: "Emma W.", rating: 3, date: '2024-05-15' },
-        { id: 'pr10', quote: "The best cardiology department, truly caring and professional.", author: "Liam T.", rating: 5, date: '2024-05-10' },
-        { id: 'pr11', quote: "The front desk staff was a bit unhelpful.", author: "Ava F.", rating: 2, date: '2024-04-28' },
-        { id: 'pr12', quote: "Very detailed explanation of my condition and treatment plan.", author: "Mason G.", rating: 4, date: '2024-04-20' },
-        { id: 'pr13', quote: "Good overall, but parking was an issue.", author: "Chloe S.", rating: 3, date: '2024-04-15' },
-        { id: 'pr14', quote: "Outstanding care from start to finish. Highly recommend.", author: "Ethan K.", rating: 5, date: '2024-04-10' },
-        { id: 'pr15', quote: "The nurse was very kind and made me feel comfortable.", author: "Harper P.", rating: 4, date: '2024-03-25' },
-        { id: 'pr16', quote: "Diagnosis was quick and treatment effective.", author: "Aiden N.", rating: 5, date: '2024-03-20' },
-        { id: 'pr17', quote: "Long wait times in the waiting room.", author: "Sofia R.", rating: 2, date: '2024-03-10' },
-        { id: 'pr18', quote: "Grateful for the thorough check-up.", author: "Logan V.", rating: 5, date: '2024-02-15' },
+        { 
+            id: 'pr1', 
+            quote: "The cardiology team here is exceptional. Dr. Smith was incredibly thorough and compassionate. I felt completely at ease.", 
+            author: "Eleanor R.", 
+            rating: 5, 
+            date: '2024-06-18',
+            department: "Cardiology",
+            helpfulCount: 12,
+            verified: true
+        },
+        { 
+            id: 'pr2', 
+            quote: "From the moment I walked in, I knew I was in good hands. The staff is so caring, and the advanced technology gave me peace of mind.", 
+            author: "James P.", 
+            rating: 5, 
+            date: '2024-06-15',
+            department: "Neurology",
+            helpfulCount: 8,
+            verified: true
+        },
+        { 
+            id: 'pr3', 
+            quote: "My experience was seamless. Scheduling was easy, and the care I received for my heart condition was top-notch. Highly recommend!", 
+            author: "Maria K.", 
+            rating: 4, 
+            date: '2024-06-12',
+            department: "Cardiology",
+            helpfulCount: 5
+        },
+        { 
+            id: 'pr4', 
+            quote: "I'm so grateful for the expertise of this department. They accurately diagnosed and treated my condition with great professionalism.", 
+            author: "Robert D.", 
+            rating: 5, 
+            date: '2024-06-10',
+            department: "Oncology",
+            helpfulCount: 15,
+            verified: true
+        },
+        { 
+            id: 'pr5', 
+            quote: "The doctors were great, but the wait times were a bit long.", 
+            author: "Sophia L.", 
+            rating: 3, 
+            date: '2024-06-01',
+            department: "Pediatrics",
+            helpfulCount: 2
+        },
+        { 
+            id: 'pr6', 
+            quote: "Excellent follow-up care and clear explanations. Very happy with the service.", 
+            author: "William B.", 
+            rating: 5, 
+            date: '2024-05-28',
+            department: "Cardiology",
+            helpfulCount: 7
+        },
+        { 
+            id: 'pr7', 
+            quote: "Could improve on communication regarding appointment changes.", 
+            author: "Olivia M.", 
+            rating: 2, 
+            date: '2024-05-25',
+            department: "Orthopedics",
+            helpfulCount: 1
+        },
+        { 
+            id: 'pr8', 
+            quote: "Life-saving treatment, profound gratitude to the entire team.", 
+            author: "Noah J.", 
+            rating: 5, 
+            date: '2024-05-20',
+            department: "Emergency",
+            helpfulCount: 20,
+            verified: true
+        },
     ]);
 
-    // --- Analytics Calculations ---
+    // State for filters and sorting
+    const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+    const [departmentFilter, setDepartmentFilter] = useState<string | null>(null);
+    const [sortBy, setSortBy] = useState<'date' | 'rating' | 'helpful'>('date');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+    const [helpfulClicked, setHelpfulClicked] = useState<Set<string>>(new Set());
+
+    // Get unique departments for filter
+    const departments = useMemo(() => {
+        const depts = new Set(reviews.map(review => review.department));
+        return Array.from(depts).sort();
+    }, [reviews]);
+
+    // Filter and sort reviews
+    const filteredReviews = useMemo(() => {
+        let result = [...reviews];
+        
+        // Apply rating filter
+        if (ratingFilter !== null) {
+            result = result.filter(review => review.rating === ratingFilter);
+        }
+        
+        // Apply department filter
+        if (departmentFilter) {
+            result = result.filter(review => review.department === departmentFilter);
+        }
+        
+        // Apply sorting
+        result.sort((a, b) => {
+            if (sortBy === 'date') {
+                return sortDirection === 'asc' 
+                    ? new Date(a.date).getTime() - new Date(b.date).getTime()
+                    : new Date(b.date).getTime() - new Date(a.date).getTime();
+            } else if (sortBy === 'rating') {
+                return sortDirection === 'asc' 
+                    ? a.rating - b.rating
+                    : b.rating - a.rating;
+            } else { // helpful
+                return sortDirection === 'asc' 
+                    ? a.helpfulCount - b.helpfulCount
+                    : b.helpfulCount - a.helpfulCount;
+            }
+        });
+        
+        return result;
+    }, [reviews, ratingFilter, departmentFilter, sortBy, sortDirection]);
+
+    // Analytics calculations
     const { averageRating, totalReviews, fiveStarCount, ratingDistribution, reviewsOverTimeData, positiveSentimentPercentage } = useMemo(() => {
-        const total = reviews.length;
-        const sumRatings = reviews.reduce((acc, review) => acc + review.rating, 0);
+        const total = filteredReviews.length;
+        const sumRatings = filteredReviews.reduce((acc, review) => acc + review.rating, 0);
         const avg = total > 0 ? (sumRatings / total) : 0;
 
         // Rating Distribution
-        const distribution = Array(5).fill(0); // [0, 0, 0, 0, 0] for 1 to 5 stars
-        reviews.forEach(review => {
+        const distribution = Array(5).fill(0);
+        filteredReviews.forEach(review => {
             if (review.rating >= 1 && review.rating <= 5) {
                 distribution[review.rating - 1]++;
             }
@@ -52,11 +161,11 @@ export default function ReviewsPage() {
         const chartData = distribution.map((count, index) => ({
             name: `${index + 1} Star${index === 0 ? '' : 's'}`,
             Reviews: count,
-        })).reverse(); // Reverse to show 5 stars first
+        })).reverse();
 
-        // Reviews Over Time (Monthly aggregation for simplicity)
+        // Reviews Over Time (Monthly)
         const monthlyReviewsMap = new Map<string, number>();
-        reviews.forEach(review => {
+        filteredReviews.forEach(review => {
             const month = review.date.substring(0, 7); // YYYY-MM
             monthlyReviewsMap.set(month, (monthlyReviewsMap.get(month) || 0) + 1);
         });
@@ -66,31 +175,27 @@ export default function ReviewsPage() {
             Reviews: monthlyReviewsMap.get(month),
         }));
 
-        // Simple Sentiment Analysis (Placeholder based on rating)
-        // In a real app, you'd use NLP for actual sentiment from `quote`
-        const positiveReviews = reviews.filter(review => review.rating >= 4).length;
+        // Sentiment Analysis
+        const positiveReviews = filteredReviews.filter(review => review.rating >= 4).length;
         const positivePercent = total > 0 ? (positiveReviews / total) * 100 : 0;
-
 
         return {
             averageRating: avg.toFixed(1),
             totalReviews: total,
-            fiveStarCount: distribution[4], // Index 4 is for 5 stars
+            fiveStarCount: distribution[4],
             ratingDistribution: chartData,
             reviewsOverTimeData: reviewsOverTimeData,
             positiveSentimentPercentage: positivePercent.toFixed(1),
         };
-    }, [reviews]);
+    }, [filteredReviews]);
 
-    // Function to render star rating SVG icons
-    const renderStars = (rating: number) => {
+    const renderStars = (rating: number, size = 4) => {
         return (
-            <div className="flex text-yellow-400">
+            <div className={`flex`}>
                 {Array.from({ length: 5 }, (_, i) => (
                     <svg
                         key={i}
-                        className={`w-4 h-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
-                        fill="currentColor"
+                        className={`w-${size} h-${size} ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300 dark:text-gray-600 fill-current'}`}
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
                     >
@@ -101,193 +206,377 @@ export default function ReviewsPage() {
         );
     };
 
-    // AI Star Animation Component
-    const AiStarAnimation = () => (
-        <svg className="w-10 h-10 text-blue-500 animate-pulse-custom" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <style >{`
-                @keyframes pulse-custom {
-                    0%, 100% { transform: scale(1); opacity: 1; }
-                    50% { transform: scale(1.1); opacity: 0.7; }
-                }
-                .animate-pulse-custom {
-                    animation: pulse-custom 2s infinite ease-in-out;
-                }
-            `}</style>
-            <path d="M12 2L9.19 8.63L2 9.24L7.54 13.5L5.82 20.5L12 17.27L18.18 20.5L16.46 13.5L22 9.24L14.81 8.63L12 2Z" />
-        </svg>
-    );
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    const handleHelpfulClick = (reviewId: string) => {
+        if (helpfulClicked.has(reviewId)) return;
+        
+        setReviews(prevReviews => 
+            prevReviews.map(review => 
+                review.id === reviewId 
+                    ? { ...review, helpfulCount: review.helpfulCount + 1 }
+                    : review
+            )
+        );
+        
+        setHelpfulClicked(prev => new Set(prev).add(reviewId));
+    };
+
+    const toggleSortDirection = () => {
+        setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    };
+
+    const clearFilters = () => {
+        setRatingFilter(null);
+        setDepartmentFilter(null);
+    };
 
     return (
-        // The main container now assumes it's within a padded layout (like your MainLayout's <Outlet /> div)
-        // Removed header as requested. Background set here.
-        <div className="flex flex-col flex-1 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-950 dark:to-blue-900 text-gray-900 dark:text-gray-100 font-inter rounded-lg overflow-auto p-4 md:p-6 lg:p-8">
-            <div className="container mx-auto max-w-full flex flex-col gap-6">
+        <div className="flex flex-col flex-1 bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans rounded-lg overflow-auto p-4 md:p-6 lg:p-8">
+            <div className="container mx-auto max-w-full flex flex-col gap-8">
 
-                {/* Grid for Key Metrics and Analytics Charts */}
-                <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Top Row: Key Metrics Cards (spanning 2 columns on large screens) */}
-                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Average Rating</CardTitle>
-                                <Star className="h-5 w-5 text-yellow-500" />
+                {/* Header with Summary */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Patient Reviews</h1>
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">
+                            {totalReviews} reviews with an average rating of {averageRating} out of 5
+                        </p>
+                    </div>
+                </div>
+
+                {/* Rating Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                        <CardHeader className="flex flex-row items-center justify-between p-0">
+                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Overall Rating</CardTitle>
+                            <Star className="h-5 w-5 text-yellow-500" />
+                        </CardHeader>
+                        <CardContent className="p-0 mt-4">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white">{averageRating}</div>
+                            <div className="flex items-center mt-1">
+                                {renderStars(Number(averageRating), 5)}
+                                <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">/ 5.0</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                        <CardHeader className="flex flex-row items-center justify-between p-0">
+                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Reviews</CardTitle>
+                            <MessageSquareText className="h-5 w-5 text-blue-500" />
+                        </CardHeader>
+                        <CardContent className="p-0 mt-4">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white">{totalReviews}</div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Patient feedback</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                        <CardHeader className="flex flex-row items-center justify-between p-0">
+                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">5-Star Reviews</CardTitle>
+                            <ThumbsUp className="h-5 w-5 text-green-500" />
+                        </CardHeader>
+                        <CardContent className="p-0 mt-4">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white">{fiveStarCount}</div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                {totalReviews > 0 ? ((fiveStarCount / totalReviews) * 100).toFixed(1) : 0}% of total
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                        <CardHeader className="flex flex-row items-center justify-between p-0">
+                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Positive Feedback</CardTitle>
+                            <TrendingUp className="h-5 w-5 text-purple-500" />
+                        </CardHeader>
+                        <CardContent className="p-0 mt-4">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-white">{positiveSentimentPercentage}%</div>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Positive experiences</p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column - Reviews */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Review Filters */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-1">
+                                <Filter className="h-4 w-4 text-gray-500" />
+                                <span className="text-sm">Filters:</span>
+                            </div>
+                            
+                            <Button 
+                                variant={ratingFilter === null ? "outline" : "default"}
+                                className="rounded-full px-4 py-2 text-sm"
+                                onClick={() => setRatingFilter(null)}
+                            >
+                                All Ratings
+                            </Button>
+                            
+                            {[5, 4, 3, 2, 1].map(rating => (
+                                <Button
+                                    key={rating}
+                                    variant={ratingFilter === rating ? "default" : "outline"}
+                                    className="rounded-full px-4 py-2 text-sm flex items-center gap-1"
+                                    onClick={() => setRatingFilter(rating)}
+                                >
+                                    {renderStars(rating, 3)}
+                                    <span>{rating}</span>
+                                </Button>
+                            ))}
+                            
+                            <Select value={departmentFilter || ""} onValueChange={val => setDepartmentFilter(val || null)}>
+                                <SelectTrigger className="w-[180px] rounded-full">
+                                    <div className="flex items-center gap-2">
+                                        <span>{departmentFilter ? departmentFilter : "All Departments"}</span>
+                                        <ChevronDown className="h-4 w-4 opacity-50" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="">All Departments</SelectItem>
+                                    {departments.map(dept => (
+                                        <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            
+                            {(ratingFilter !== null || departmentFilter) && (
+                                <Button 
+                                    variant="ghost" 
+                                    className="text-sm text-blue-600 dark:text-blue-400"
+                                    onClick={clearFilters}
+                                >
+                                    Clear filters
+                                </Button>
+                            )}
+                        </div>
+                        
+                        {/* Sort Controls */}
+                        <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Showing {filteredReviews.length} of {reviews.length} reviews
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-500 dark:text-gray-400">Sort by:</span>
+                                <Select value={sortBy} onValueChange={val => setSortBy(val as 'date' | 'rating' | 'helpful')}>
+                                    <SelectTrigger className="w-[120px]">
+                                        <SelectValue placeholder="Sort by" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="date">Date</SelectItem>
+                                        <SelectItem value="rating">Rating</SelectItem>
+                                        <SelectItem value="helpful">Helpful</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="h-9 w-9"
+                                    onClick={toggleSortDirection}
+                                >
+                                    {sortDirection === 'asc' ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="m3 16 4 4 4-4" />
+                                            <path d="M7 20V4" />
+                                            <path d="m21 8-4-4-4 4" />
+                                            <path d="M17 4v16" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="m21 16-4 4-4-4" />
+                                            <path d="M17 20V4" />
+                                            <path d="m3 8 4-4 4 4" />
+                                            <path d="M7 4v16" />
+                                        </svg>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Reviews List */}
+                        <div className="space-y-6">
+                            {filteredReviews.length > 0 ? (
+                                filteredReviews.map((review) => (
+                                    <Card key={review.id} className="rounded-xl border border-gray-200 dark:border-gray-800 p-6 hover:shadow-sm transition-shadow">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    {renderStars(review.rating, 5)}
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                        {formatDate(review.date)}
+                                                    </span>
+                                                    {review.verified && (
+                                                        <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-0.5 rounded-full">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                                                <path d="m9 11 3 3L22 4" />
+                                                            </svg>
+                                                            Verified
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full mt-2">
+                                                    {review.department}
+                                                </span>
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                <ChevronRight className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        
+                                        <CardContent className="p-0 mt-4">
+                                            <p className="text-gray-800 dark:text-gray-200">
+                                                "{review.quote}"
+                                            </p>
+                                            <div className="mt-4 flex items-center justify-between">
+                                                <p className="font-medium text-gray-900 dark:text-white">- {review.author}</p>
+                                                <Button 
+                                                    variant={helpfulClicked.has(review.id) ? "default" : "outline"}
+                                                    size="sm" 
+                                                    className="rounded-full"
+                                                    onClick={() => handleHelpfulClick(review.id)}
+                                                    disabled={helpfulClicked.has(review.id)}
+                                                >
+                                                    Helpful ({review.helpfulCount})
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))
+                            ) : (
+                                <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-6 text-center">
+                                    <p className="text-gray-500 dark:text-gray-400">No reviews match your filters.</p>
+                                    <Button 
+                                        variant="ghost" 
+                                        className="mt-2 text-blue-600 dark:text-blue-400"
+                                        onClick={clearFilters}
+                                    >
+                                        Clear filters
+                                    </Button>
+                                </Card>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Right Column - Analytics */}
+                    <div className="space-y-6">
+                        {/* Rating Distribution */}
+                        <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-6">
+                            <CardHeader className="p-0">
+                                <CardTitle className="text-lg font-semibold">Rating Distribution</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{averageRating} / 5.0</div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Based on {totalReviews} reviews</p>
+                            <CardContent className="p-0 mt-4 h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={ratingDistribution}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                        <XAxis 
+                                            dataKey="name" 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fill: '#6b7280' }}
+                                        />
+                                        <YAxis 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fill: '#6b7280' }}
+                                        />
+                                        <Tooltip 
+                                            contentStyle={{
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                                border: '1px solid #e5e7eb'
+                                            }}
+                                        />
+                                        <Bar 
+                                            dataKey="Reviews" 
+                                            fill="#3b82f6" 
+                                            radius={[4, 4, 0, 0]} 
+                                            barSize={24}
+                                        />
+                                    </BarChart>
+                                </ResponsiveContainer>
                             </CardContent>
                         </Card>
-                        <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Reviews</CardTitle>
-                                <MessageSquareText className="h-5 w-5 text-blue-500" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{totalReviews}</div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Across all patients</p>
-                            </CardContent>
+
+                        {/* AI Insights */}
+                        <Card className="rounded-xl border border-blue-200 dark:border-blue-900 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/50 dark:to-blue-900 p-6">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-full">
+                                    <Sparkles className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg font-semibold text-blue-900 dark:text-blue-100">
+                                        AI-Powered Insights
+                                    </CardTitle>
+                                    <CardDescription className="text-blue-800 dark:text-blue-200 mt-2">
+                                        {filteredReviews.length > 0 ? (
+                                            <>
+                                                Our analysis shows {positiveSentimentPercentage}% of recent reviews are positive.
+                                                {filteredReviews.some(r => r.department === "Cardiology") && " Cardiology receives the most praise."}
+                                            </>
+                                        ) : "Apply filters to see insights about specific reviews."}
+                                    </CardDescription>
+                                    <Button 
+                                        variant="ghost" 
+                                        className="mt-4 text-blue-600 dark:text-blue-300 hover:bg-blue-200/50 dark:hover:bg-blue-800/50"
+                                    >
+                                        View detailed analysis
+                                        <ChevronRight className="ml-1 h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
                         </Card>
-                        <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">5-Star Reviews</CardTitle>
-                                <ThumbsUp className="h-5 w-5 text-green-500" />
+
+                        {/* Reviews Over Time */}
+                        <Card className="rounded-xl border border-gray-200 dark:border-gray-800 p-6">
+                            <CardHeader className="p-0">
+                                <CardTitle className="text-lg font-semibold">Reviews Over Time</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{fiveStarCount}</div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">{((fiveStarCount / totalReviews) * 100 || 0).toFixed(1)}% of total</p>
-                            </CardContent>
-                        </Card>
-                        <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Positive Sentiment</CardTitle>
-                                <TrendingUp className="h-5 w-5 text-purple-500" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{positiveSentimentPercentage}%</div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Of high-rated reviews</p>
+                            <CardContent className="p-0 mt-4 h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={reviewsOverTimeData}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                        <XAxis 
+                                            dataKey="name" 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fill: '#6b7280' }}
+                                        />
+                                        <YAxis 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fill: '#6b7280' }}
+                                        />
+                                        <Tooltip 
+                                            contentStyle={{
+                                                backgroundColor: 'white',
+                                                borderRadius: '8px',
+                                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                                border: '1px solid #e5e7eb'
+                                            }}
+                                        />
+                                        <Line 
+                                            type="monotone" 
+                                            dataKey="Reviews" 
+                                            stroke="#3b82f6" 
+                                            strokeWidth={2} 
+                                            dot={{ r: 4 }} 
+                                            activeDot={{ r: 6, stroke: '#1d4ed8' }}
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
                             </CardContent>
                         </Card>
                     </div>
-
-                    {/* AI-Powered Insights Card (spanning 1 column on large screens) */}
-                    <Card className="rounded-xl shadow-md border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900 p-6 flex flex-col items-center justify-center text-center">
-                        <AiStarAnimation />
-                        <CardTitle className="text-xl font-bold text-blue-700 dark:text-blue-300 mt-4 mb-2">AI Insights</CardTitle>
-                        <CardDescription className="text-center text-blue-600 dark:text-blue-400 text-sm">
-                            Harnessing AI to understand patient feedback trends and key areas for improvement.
-                        </CardDescription>
-                        <Button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-md transition-colors duration-300">
-                            Explore Trends
-                        </Button>
-                    </Card>
-                </section>
-
-                {/* Charts Section: Rating Distribution and Reviews Over Time */}
-                <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
-                    {/* Rating Distribution Chart */}
-                    <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 flex flex-col">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Rating Distribution</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-1 min-h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={ratingDistribution}
-                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                                    <XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false} />
-                                    <YAxis stroke="#666" allowDecimals={false} tickLine={false} axisLine={false} />
-                                    <Tooltip
-                                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                                        labelStyle={{ color: '#333', fontWeight: 'bold' }}
-                                        itemStyle={{ color: '#555' }}
-                                    />
-                                    <Legend />
-                                    <Bar dataKey="Reviews" fill="#6366F1" radius={[8, 8, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-
-                    {/* Reviews Over Time Chart */}
-                    <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 flex flex-col">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Reviews Over Time</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-1 min-h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <LineChart
-                                    data={reviewsOverTimeData}
-                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                                    <XAxis dataKey="name" stroke="#666" tickLine={false} axisLine={false} />
-                                    <YAxis stroke="#666" allowDecimals={false} tickLine={false} axisLine={false} />
-                                    <Tooltip
-                                        cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                                        contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-                                        labelStyle={{ color: '#333', fontWeight: 'bold' }}
-                                        itemStyle={{ color: '#555' }}
-                                    />
-                                    <Legend />
-                                    <Line type="monotone" dataKey="Reviews" stroke="#2563EB" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </CardContent>
-                    </Card>
-                </section>
-
-                {/* Recent Patient Testimonials Section - now a larger, dedicated scrollable card */}
-                <section>
-                    <Card className="rounded-xl shadow-md border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 flex flex-col">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">Latest Patient Testimonials</CardTitle>
-                        </CardHeader>
-                        <CardContent className="overflow-y-auto custom-scrollbar h-[400px] lg:h-[500px]"> {/* Adjusted height for better scrolling */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                {reviews.map((review) => ( // Display all reviews here
-                                    <Card
-                                        key={review.id}
-                                        className="bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm p-4 flex flex-col justify-between border border-gray-200 dark:border-gray-600"
-                                    >
-                                        {renderStars(review.rating)}
-                                        <p className="text-sm italic mt-2 text-gray-700 dark:text-gray-300 leading-relaxed">
-                                            "{review.quote}"
-                                        </p>
-                                        <div className="w-full text-left mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-                                            <p className="font-semibold text-blue-600 dark:text-blue-400 text-base">- {review.author}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">{review.date}</p>
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                            {reviews.length === 0 && (
-                                <p className="text-center text-gray-500 mt-8">No reviews available.</p>
-                            )}
-                        </CardContent>
-                    </Card>
-                </section>
-
+                </div>
             </div>
-            {/* Custom Scrollbar CSS */}
-            <style>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 8px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: #f1f1f1;
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: #888;
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: #555;
-                }
-            `}</style>
         </div>
     );
 }
